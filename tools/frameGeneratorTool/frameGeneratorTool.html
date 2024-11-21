@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoPixel Christmas Tree Animation Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #C41E3A;
+            --secondary-color: #165B33;
+            --accent-color: #F8B229;
+            --background-light: #FFFFFF;
+            --background-dark: #121212;
+            --text-light: #000000;
+            --text-dark: #FFFFFF;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: var(--background-dark);
+                color: var(--text-dark);
+            }
+            .output-box-container {
+                background-color: #1E1E1E !important;
+            }
+            .output-box {
+                background-color: #2D2D2D !important;
+                border-color: #3D3D3D !important;
+                color: var(--text-dark);
+            }
+            .btn-primary {
+                background-color: var(--primary-color);
+                border-color: var(--primary-color);
+            }
+            .btn-secondary {
+                background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
+            }
+            .btn-success {
+                background-color: var(--accent-color);
+                border-color: var(--accent-color);
+                color: var(--text-light);
+            }
+        }
+
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s ease;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .editor-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .tree-container { 
+            position: relative; 
+            width: 300px; 
+            height: 400px; 
+            background-image: url('PCB_Image.png'); 
+            background-size: contain; 
+            background-repeat: no-repeat; 
+        }
+        .pixel { 
+            position: absolute; 
+            width: 20px; 
+            height: 20px; 
+            cursor: pointer; 
+            border-radius: 50%; 
+            border: 1px solid #ccc; 
+        }
+        .controls {
+            flex: 0 0 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .buttons-container .btn {
+            width: 100%;
+            white-space: normal;
+            min-height: 38px;
+        }
+        .output-box-container {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        .output-box {
+            white-space: pre-wrap;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        .output-container { 
+            width: 100%;
+            max-width: 800px;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-dark);
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        .header-links {
+            margin-top: 10px;
+        }
+        .header-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .header-links a:hover {
+            color: var(--accent-color);
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-dark);
+            padding: 1rem 0;
+            text-align: center;
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        footer a {
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: var(--accent-color);
+        }
+        #colorPicker {
+            position: absolute;
+            opacity: 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>NeoPixel Christmas Tree Animation Editor</h1>
+        <p>Version 1.0</p>
+        <div class="header-links">
+            <a href="https://github.com/Jan-OleGiebel/LoRaWAN-LED-Christmas-Tree" target="_blank">GitHub Project</a>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <p id="frameInfo" class="text-center">Current Frame: 1</p>
+
+        <div class="editor-container">
+            <div class="controls">
+                <label class="form-label">Delay Time (s):</label>
+                <input type="number" id="frameDelayInput" class="form-control mb-3" min="0" max="255" value="1">
+                <label class="form-label">Fade Time (s):</label>
+                <input type="number" id="fadeTimeInput" class="form-control mb-3" min="0" max="255" value="1">
+            </div>
+
+            <div class="tree-container" id="tree"></div>
+
+            <div class="controls buttons-container">
+              <button class="btn btn-primary" onclick="addFrame()">Add Frame (max. 6)</button>
+              <button class="btn btn-secondary" onclick="selectFrame(-1)">Previous Frame</button>
+              <button class="btn btn-secondary" onclick="selectFrame(1)">Next Frame</button>
+              <button class="btn btn-success" onclick="playAnimation()">Play Animation</button>
+              <button class="btn btn-danger" onclick="stopAnimation()">Stop Animation</button>
+              <button class="btn btn-warning" onclick="resetAnimation()">Reset</button>
+              <button class="btn btn-info" onclick="exportAnimation()">Export Animation</button>
+              <button class="btn btn-outline-primary" onclick="overwriteCurrentFrame()">Overwrite Current Frame</button>
+              <button class="btn btn-outline-secondary" onclick="setAllLEDs(event)">Set All LEDs</button>
+            </div>
+        </div>
+
+        <div id="outputContainer" class="output-container"></div>
+    </div>
+
+    <footer>
+        <div>© 2024 Jan-Ole Giebel</div>
+        <div><a href="https://jo-technik.com/impressum/" target="_blank">Legal Notice</a></div>
+    </footer>
+
+    <input type="color" id="colorPicker" class="pixel-color-picker">
+
+    <script>
+        const frames = [];
+        let currentFrame = 0;
+        const MAX_FRAMES = 6;
+        const NUM_PIXELS = 16;
+        const pixelPositions = [
+            { x: 135, y: 18 }, { x: 135, y: 70 }, { x: 175, y: 85 }, { x: 160, y: 140 },
+            { x: 195, y: 170 }, { x: 168, y: 230 }, { x: 220, y: 255 }, { x: 185, y: 300 },
+            { x: 245, y: 335 }, { x: 30, y: 335 }, { x: 50, y: 255 }, { x: 85, y: 295 },
+            { x: 100, y: 215 }, { x: 75, y: 170 }, { x: 110, y: 130 }, { x: 100, y: 85 }
+        ];
+        let animationInterval;
+
+        window.onload = () => {
+            const tree = document.getElementById('tree');
+            pixelPositions.forEach((pos, index) => {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                pixel.style.left = `${pos.x}px`;
+                pixel.style.top = `${pos.y}px`;
+                pixel.onclick = (event) => openColorPicker(index, event);
+                pixel.dataset.index = index;
+                tree.appendChild(pixel);
+            });
+            addFrame();
+        };
+
+        function createOutputBoxes() {
+            const container = document.getElementById('outputContainer');
+            container.innerHTML = '';
+            
+            const numBoxesNeeded = Math.ceil(frames.length / 2);
+            
+            for (let i = 0; i < numBoxesNeeded; i++) {
+                const boxContainer = document.createElement('div');
+                boxContainer.className = 'output-box-container';
+                
+                const header = document.createElement('h4');
+                header.textContent = `Payload ${i + 1}`;
+                
+                const copyButton = document.createElement('button');
+                copyButton.className = 'btn btn-outline-info mb-2';
+                copyButton.textContent = 'Copy Payload';
+                copyButton.onclick = () => copySpecificPayload(i + 1);
+                
+                const outputBox = document.createElement('div');
+                outputBox.className = 'output-box';
+                outputBox.id = `output${i + 1}`;
+                
+                boxContainer.appendChild(header);
+                boxContainer.appendChild(copyButton);
+                boxContainer.appendChild(outputBox);
+                container.appendChild(boxContainer);
+            }
+        }
+
+        function addFrame() {
+            if (frames.length >= MAX_FRAMES) return alert("Maximum number of frames reached.");
+            const frame = {
+                delay: 1,
+                fade: 1,
+                pixels: Array(NUM_PIXELS).fill([0, 0, 0])
+            };
+            frames.push(frame);
+            currentFrame = frames.length - 1;
+            updateFrameInfo();
+            resetGrid();
+        }
+
+        function openColorPicker(index, event) {
+            event.preventDefault(); // Prevent any default behavior
+            const pixel = event.target;
+            const rect = pixel.getBoundingClientRect();
+            const colorPicker = document.getElementById('colorPicker');
+            
+            colorPicker.style.display = 'block';
+            colorPicker.style.opacity = '0';
+            colorPicker.style.position = 'absolute';
+            // Position it to the right of the LED
+            colorPicker.style.left = `${rect.right + window.scrollX + 5}px`;
+            colorPicker.style.top = `${rect.top + window.scrollY}px`;
+            
+            colorPicker.oninput = () => setPixelColor(index, colorPicker.value);
+            colorPicker.onchange = () => colorPicker.style.display = 'none';
+            
+            // Small delay to ensure proper positioning
+            setTimeout(() => colorPicker.click(), 0);
+        }
+
+        function setAllLEDs(event) {
+            event.preventDefault(); // Prevent any default behavior
+            const button = event.target;
+            const rect = button.getBoundingClientRect();
+            const colorPicker = document.getElementById('colorPicker');
+            
+            colorPicker.style.display = 'block';
+            colorPicker.style.opacity = '0';
+            colorPicker.style.position = 'absolute';
+            // Position it to the right of the button
+            colorPicker.style.left = `${rect.right + window.scrollX + 5}px`;
+            colorPicker.style.top = `${rect.top + window.scrollY}px`;
+            
+            colorPicker.oninput = () => {
+                const [r, g, b] = hexToRgb(colorPicker.value);
+                frames[currentFrame].pixels = Array(NUM_PIXELS).fill([r, g, b]);
+                document.querySelectorAll('.pixel').forEach(pixel => {
+                    pixel.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+                });
+            };
+            colorPicker.onchange = () => colorPicker.style.display = 'none';
+            
+            // Small delay to ensure proper positioning
+            setTimeout(() => colorPicker.click(), 0);
+        }
+
+        function setPixelColor(index, color) {
+            const [r, g, b] = hexToRgb(color);
+            frames[currentFrame].pixels[index] = [r, g, b];
+            document.getElementsByClassName('pixel')[index].style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function hexToRgb(hex) {
+            const bigint = parseInt(hex.slice(1), 16);
+            return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+        }
+
+        function selectFrame(direction) {
+            currentFrame += direction;
+            if (currentFrame < 0) currentFrame = 0;
+            if (currentFrame >= frames.length) currentFrame = frames.length - 1;
+            updateFrameInfo();
+            resetGrid();
+        }
+
+        function overwriteCurrentFrame() {
+            frames[currentFrame].delay = parseInt(document.getElementById('frameDelayInput').value);
+            frames[currentFrame].fade = parseInt(document.getElementById('fadeTimeInput').value);
+            resetGrid();
+        }
+
+        function updateFrameInfo() {
+            document.getElementById('frameInfo').innerText = `Current Frame: ${currentFrame + 1}`;
+            document.getElementById('frameDelayInput').value = frames[currentFrame].delay;
+            document.getElementById('fadeTimeInput').value = frames[currentFrame].fade;
+        }
+
+        function resetGrid() {
+            const frame = frames[currentFrame];
+            frame.pixels.forEach((rgb, index) => {
+                const pixelElement = document.getElementsByClassName('pixel')[index];
+                pixelElement.style.transition = `background-color ${frame.fade}s linear`;
+                pixelElement.style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+            });
+        }
+
+        function playAnimation() {
+            let index = 0;
+
+            function displayFrame() {
+                if (index >= frames.length) index = 0;
+                const frame = frames[index];
+                document.getElementById('frameInfo').innerText = `Current Frame: ${index + 1}`;
+                resetGrid();
+                frame.pixels.forEach((rgb, i) => {
+                    const pixelElement = document.getElementsByClassName('pixel')[i];
+                    pixelElement.style.transition = `background-color ${frame.fade}s linear`;
+                    pixelElement.style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+                });
+                index++;
+                animationInterval = setTimeout(displayFrame, frame.delay * 1000);
+            }
+
+            stopAnimation();
+            displayFrame();
+        }
+
+        function stopAnimation() {
+            clearTimeout(animationInterval);
+        }
+
+        function exportAnimation() {
+            createOutputBoxes();
+            const totalFrames = frames.length;
+            let remainingFrames = totalFrames;
+            let processedFrames = 0;
+            
+            while (remainingFrames > 0) {
+                const currentBoxFrames = Math.min(2, remainingFrames);
+                const boxIndex = Math.floor(processedFrames / 2) + 1;
+                const payload = createPayloadForFrames(processedFrames, currentBoxFrames, remainingFrames);
+                document.getElementById(`output${boxIndex}`).innerText = payload;
+                processedFrames += currentBoxFrames;
+                remainingFrames -= currentBoxFrames;
+            }
+        }
+
+        function createPayloadForFrames(startIndex, frameCount, remainingFrames) {
+            const header = [0x05, remainingFrames];
+            const payload = [];
+            for (let i = 0; i < frameCount; i++) {
+                const frame = frames[startIndex + i];
+                payload.push(frame.delay, frame.fade);
+                frame.pixels.forEach(([r, g, b]) => {
+                    payload.push(r, g, b);
+                });
+            }
+            const fullPayload = [...header, ...payload];
+            return fullPayload.map(byte => byte.toString(16).padStart(2, '0')).join(' ').replace(/(.{48})/g, "$1\n");
+        }
+
+        function copySpecificPayload(boxNumber) {
+            const output = document.getElementById(`output${boxNumber}`).innerText;
+            navigator.clipboard.writeText(output).then(() => alert(`Payload ${boxNumber} copied!`));
+        }
+
+        function resetAnimation() {
+            frames.length = 0;
+            addFrame();
+        }
+    </script>
+</body>
+</html>
