@@ -74,11 +74,14 @@ function decodeDownlink(input) {
       case 0x05:
         if (bytes.length < 3) throw new Error('Invalid length for animation data');
         decoded.data.command = 'setAnimation';
-        const numFrames = bytes[1];
-        decoded.data.frames = [];
+        
+        const totalRemainingFrames = bytes[1];
+        const frames = [];
         
         let offset = 2;
-        for (let i = 0; i < numFrames; i++) {
+        const framesInPayload = Math.min(2, totalRemainingFrames);
+        
+        for (let i = 0; i < framesInPayload; i++) {
           if (offset + 50 > bytes.length) throw new Error(`Incomplete frame data for frame ${i}`);
           
           const frame = {
@@ -96,9 +99,12 @@ function decodeDownlink(input) {
             });
           }
           
-          decoded.data.frames.push(frame);
+          frames.push(frame);
           offset += 50;
         }
+        
+        decoded.data.frames = frames;
+        decoded.data.remainingFrames = totalRemainingFrames - framesInPayload;
         break;
         
       default:
