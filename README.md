@@ -22,7 +22,7 @@ To get the most out of the Christmas Tree, I highly recommend using high capacit
 ## Sensor description
 
 The Christmas Tree has an integrated Sensirion SHT41-AD1F-R2 temperature and humidity sensor.
-[Link to the product](https://sensirion.com/products/catalog/SHT41-AD1F)
+[Link to the sensor.](https://sensirion.com/products/catalog/SHT41-AD1F)
 
 Here are the sensor specifications:
 
