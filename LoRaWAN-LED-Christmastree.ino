@@ -25,12 +25,12 @@
 #include <Wire.h>
 #include "WS2816_Driver.h"
 
-#define FW_VERSION 3
+#define FW_VERSION 4
 
 // Neopixel configuration
-#define NEOPIXEL_PIN PA1  // Adjust pin number as needed
+#define NEOPIXEL_PIN PA1
 #define NUM_PIXELS 16
-WS2816_Driver strip(NUM_PIXELS, NEOPIXEL_PIN);
+WS2816_Driver leds(NUM_PIXELS, NEOPIXEL_PIN);
 
 // User button configuration
 #define USR_BTN PA9
@@ -63,9 +63,6 @@ uint16_t maxBrightness = 15000;
 #define FLASH_OFFSET_PIXELSTATE01 10
 #define FLASH_OFFSET_PIXELSTATE02 58
 #define FLASH_OFFSET_PIXELSTATE03 106
-
-// Größe der Daten pro Frame: 2 Byte für Delay/Fade + 3 Bytes pro Pixel
-int payloadSize = 2 + (NUM_PIXELS * 3);
 
 // Sensor data structure
 struct {
@@ -117,34 +114,25 @@ void loadNeopixelState(NeopixelState &pixelState, uint32_t offset) {
         pixelState.colors[i] = 0;
       }
     }
-
-    Serial.println("Loaded colors:");
     
     int storageCounter = 0;
-    strip.clear();
+    leds.clear();
     // Apply loaded state to pixels
     for (int i = 0; i < NUM_PIXELS; i++) {
-        Serial.print("R: ");
-        Serial.println(pixelState.colors[storageCounter]);
-        Serial.print("G: ");
-        Serial.println(pixelState.colors[storageCounter+1]);
-        Serial.print("B: ");
-        Serial.println(pixelState.colors[storageCounter+2]);
-
-        strip.setPixelColor(i, map(pixelState.colors[storageCounter], 0, 255, 0, maxBrightness), map(pixelState.colors[storageCounter+1], 0, 255, 0, maxBrightness), map(pixelState.colors[storageCounter+2], 0, 255, 0, maxBrightness));
+        leds.setPixelColor(i, map(pixelState.colors[storageCounter], 0, 255, 0, maxBrightness), map(pixelState.colors[storageCounter+1], 0, 255, 0, maxBrightness), map(pixelState.colors[storageCounter+2], 0, 255, 0, maxBrightness));
 
         storageCounter += 3;
     }
-    strip.show();
+    leds.show();
 
     storageCounter = 0;
     // Apply loaded state to pixels
     for (int i = 0; i < NUM_PIXELS; i++) {
-        strip.setPixelColor(i, map(pixelState.colors[storageCounter], 0, 255, 0, maxBrightness), map(pixelState.colors[storageCounter+1], 0, 255, 0, maxBrightness), map(pixelState.colors[storageCounter+2], 0, 255, 0, maxBrightness));
+        leds.setPixelColor(i, map(pixelState.colors[storageCounter], 0, 255, 0, maxBrightness), map(pixelState.colors[storageCounter+1], 0, 255, 0, maxBrightness), map(pixelState.colors[storageCounter+2], 0, 255, 0, maxBrightness));
 
         storageCounter += 3;
     }
-    strip.show();
+    leds.show();
 }
 
 void saveNeopixelState(NeopixelState &pixelState, uint32_t offset) {
@@ -191,31 +179,31 @@ int animation1(struct rt *rt) {
 
   uint16_t animation_step = 0;
   while(mode == (uint8_t)10) {
-    for(uint16_t i = 0; i < strip.numPixels(); i++) {
+    for(uint16_t i = 0; i < leds.numPixels(); i++) {
       uint16_t phase = (i + animation_step) % 6;
       
       switch(phase) {
         case 0:
-          strip.setPixelColor(i, maxBrightness, 0, 0);
+          leds.setPixelColor(i, maxBrightness, 0, 0);
           break;
         case 1:
-          strip.setPixelColor(i, maxBrightness, maxBrightness, 0);
+          leds.setPixelColor(i, maxBrightness, maxBrightness, 0);
           break;
         case 2:
-          strip.setPixelColor(i, 0, maxBrightness, 0);
+          leds.setPixelColor(i, 0, maxBrightness, 0);
           break;
         case 3:
-          strip.setPixelColor(i, 0, maxBrightness, maxBrightness);
+          leds.setPixelColor(i, 0, maxBrightness, maxBrightness);
           break;
         case 4:
-          strip.setPixelColor(i, 0, 0, maxBrightness);
+          leds.setPixelColor(i, 0, 0, maxBrightness);
           break;
         case 5:
-          strip.setPixelColor(i, maxBrightness, 0, maxBrightness);
+          leds.setPixelColor(i, maxBrightness, 0, maxBrightness);
           break;
       }
     }
-    strip.show();
+    leds.show();
     delay(50);
     animation_step++;
   }
@@ -227,46 +215,46 @@ int animation2(struct rt *rt) {
   RT_BEGIN(rt);
 
   while(mode == (uint8_t)11) {
-    strip.setPixelColor(0, maxBrightness, 0, 0);
-    strip.setPixelColor(2, maxBrightness, 0, 0);
-    strip.setPixelColor(4, maxBrightness, 0, 0);
-    strip.setPixelColor(6, maxBrightness, 0, 0);
-    strip.setPixelColor(8, maxBrightness, 0, 0);
-    strip.setPixelColor(9, maxBrightness, 0, 0);
-    strip.setPixelColor(10, maxBrightness, 0, 0);
-    strip.setPixelColor(13, maxBrightness, 0, 0);
-    strip.setPixelColor(15, maxBrightness, 0, 0);
+    leds.setPixelColor(0, maxBrightness, 0, 0);
+    leds.setPixelColor(2, maxBrightness, 0, 0);
+    leds.setPixelColor(4, maxBrightness, 0, 0);
+    leds.setPixelColor(6, maxBrightness, 0, 0);
+    leds.setPixelColor(8, maxBrightness, 0, 0);
+    leds.setPixelColor(9, maxBrightness, 0, 0);
+    leds.setPixelColor(10, maxBrightness, 0, 0);
+    leds.setPixelColor(13, maxBrightness, 0, 0);
+    leds.setPixelColor(15, maxBrightness, 0, 0);
     
-    strip.setPixelColor(1, COLOR_OFF);
-    strip.setPixelColor(3, COLOR_OFF);
-    strip.setPixelColor(5, COLOR_OFF);
-    strip.setPixelColor(7, COLOR_OFF);
-    strip.setPixelColor(11, COLOR_OFF);
-    strip.setPixelColor(12, COLOR_OFF);
-    strip.setPixelColor(14, COLOR_OFF);
+    leds.setPixelColor(1, COLOR_OFF);
+    leds.setPixelColor(3, COLOR_OFF);
+    leds.setPixelColor(5, COLOR_OFF);
+    leds.setPixelColor(7, COLOR_OFF);
+    leds.setPixelColor(11, COLOR_OFF);
+    leds.setPixelColor(12, COLOR_OFF);
+    leds.setPixelColor(14, COLOR_OFF);
 
-    strip.show();
+    leds.show();
     delay(1000);
 
-    strip.setPixelColor(0, COLOR_OFF);
-    strip.setPixelColor(2, COLOR_OFF);
-    strip.setPixelColor(4, COLOR_OFF);
-    strip.setPixelColor(6, COLOR_OFF);
-    strip.setPixelColor(8, COLOR_OFF);
-    strip.setPixelColor(9, COLOR_OFF);
-    strip.setPixelColor(10, COLOR_OFF);
-    strip.setPixelColor(13, COLOR_OFF);
-    strip.setPixelColor(15, COLOR_OFF);
+    leds.setPixelColor(0, COLOR_OFF);
+    leds.setPixelColor(2, COLOR_OFF);
+    leds.setPixelColor(4, COLOR_OFF);
+    leds.setPixelColor(6, COLOR_OFF);
+    leds.setPixelColor(8, COLOR_OFF);
+    leds.setPixelColor(9, COLOR_OFF);
+    leds.setPixelColor(10, COLOR_OFF);
+    leds.setPixelColor(13, COLOR_OFF);
+    leds.setPixelColor(15, COLOR_OFF);
     
-    strip.setPixelColor(1, 0, maxBrightness, 0);
-    strip.setPixelColor(3, 0, maxBrightness, 0);
-    strip.setPixelColor(5, 0, maxBrightness, 0);
-    strip.setPixelColor(7, 0, maxBrightness, 0);
-    strip.setPixelColor(11, 0, maxBrightness, 0);
-    strip.setPixelColor(12, 0, maxBrightness, 0);
-    strip.setPixelColor(14, 0, maxBrightness, 0);
+    leds.setPixelColor(1, 0, maxBrightness, 0);
+    leds.setPixelColor(3, 0, maxBrightness, 0);
+    leds.setPixelColor(5, 0, maxBrightness, 0);
+    leds.setPixelColor(7, 0, maxBrightness, 0);
+    leds.setPixelColor(11, 0, maxBrightness, 0);
+    leds.setPixelColor(12, 0, maxBrightness, 0);
+    leds.setPixelColor(14, 0, maxBrightness, 0);
 
-    strip.show();
+    leds.show();
     delay(1000);
   }
 
@@ -292,90 +280,90 @@ int animation3(struct rt *rt) {
 
   uint16_t animation_step = 0;
   while(mode == (uint8_t)12) {
-    strip.clear();
+    leds.clear();
 
-    strip.setPixelColor(8, COLOR_AMBER_WITH_BRIGHTNESS);
-    strip.setPixelColor(9, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(8, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(9, COLOR_AMBER_WITH_BRIGHTNESS);
 
-    strip.show();
+    leds.show();
     delay(1000);
 
     if((int)mode != 12) {
       break;
     }
 
-    strip.setPixelColor(7, COLOR_AMBER_WITH_BRIGHTNESS);
-    strip.setPixelColor(11, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(7, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(11, COLOR_AMBER_WITH_BRIGHTNESS);
 
-    strip.show();
+    leds.show();
     delay(1000);
 
     if((int)mode != 12) {
       break;
     }
 
-    strip.setPixelColor(6, COLOR_AMBER_WITH_BRIGHTNESS);
-    strip.setPixelColor(10, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(6, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(10, COLOR_AMBER_WITH_BRIGHTNESS);
 
-    strip.show();
+    leds.show();
     delay(1000);
 
     if((int)mode != 12) {
       break;
     }
 
-    strip.setPixelColor(5, COLOR_AMBER_WITH_BRIGHTNESS);
-    strip.setPixelColor(12, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(5, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(12, COLOR_AMBER_WITH_BRIGHTNESS);
 
-    strip.show();
+    leds.show();
     delay(1000);
 
     if((int)mode != 12) {
       break;
     }
 
-    strip.setPixelColor(4, COLOR_AMBER_WITH_BRIGHTNESS);
-    strip.setPixelColor(13, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(4, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(13, COLOR_AMBER_WITH_BRIGHTNESS);
 
-    strip.show();
+    leds.show();
     delay(1000);
 
     if((int)mode != 12) {
       break;
     }
 
-    strip.setPixelColor(3, COLOR_AMBER_WITH_BRIGHTNESS);
-    strip.setPixelColor(14, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(3, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(14, COLOR_AMBER_WITH_BRIGHTNESS);
 
-    strip.show();
+    leds.show();
     delay(1000);
 
     if((int)mode != 12) {
       break;
     }
 
-    strip.setPixelColor(2, COLOR_AMBER_WITH_BRIGHTNESS);
-    strip.setPixelColor(15, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(2, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(15, COLOR_AMBER_WITH_BRIGHTNESS);
 
-    strip.show();
+    leds.show();
     delay(1000);
 
     if((int)mode != 12) {
       break;
     }
 
-    strip.setPixelColor(1, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(1, COLOR_AMBER_WITH_BRIGHTNESS);
 
-    strip.show();
+    leds.show();
     delay(1000);
 
     if((int)mode != 12) {
       break;
     }
 
-    strip.setPixelColor(0, COLOR_AMBER_WITH_BRIGHTNESS);
+    leds.setPixelColor(0, COLOR_AMBER_WITH_BRIGHTNESS);
 
-    strip.show();
+    leds.show();
     delay(1000);
 
     if((int)mode != 12) {
@@ -387,27 +375,13 @@ int animation3(struct rt *rt) {
         break;
       }
 
-      strip.setPixelColor(0, 0, 0, 0);
-      strip.setPixelColor(3, 0, 0, 0);
-      strip.setPixelColor(7, 0, 0, 0);
-      strip.setPixelColor(11, 0, 0, 0);
-      strip.setPixelColor(15, 0, 0, 0);
+      leds.setPixelColor(0, 0, 0, 0);
+      leds.setPixelColor(3, 0, 0, 0);
+      leds.setPixelColor(7, 0, 0, 0);
+      leds.setPixelColor(11, 0, 0, 0);
+      leds.setPixelColor(15, 0, 0, 0);
 
-      strip.show();
-
-      delay(100);
-
-      if((int)mode != 12) {
-        break;
-      }
-
-      strip.setPixelColor(0, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(3, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(7, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(11, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(15, COLOR_AMBER_WITH_BRIGHTNESS);
-
-      strip.show();
+      leds.show();
 
       delay(100);
 
@@ -415,25 +389,13 @@ int animation3(struct rt *rt) {
         break;
       }
 
-      strip.setPixelColor(1, 0, 0, 0);
-      strip.setPixelColor(4, 0, 0, 0);
-      strip.setPixelColor(8, 0, 0, 0);
-      strip.setPixelColor(12, 0, 0, 0);
+      leds.setPixelColor(0, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(3, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(7, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(11, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(15, COLOR_AMBER_WITH_BRIGHTNESS);
 
-      strip.show();
-
-      delay(100);
-
-      if((int)mode != 12) {
-        break;
-      }
-
-      strip.setPixelColor(1, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(4, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(8, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(12, COLOR_AMBER_WITH_BRIGHTNESS);
-
-      strip.show();
+      leds.show();
 
       delay(100);
 
@@ -441,25 +403,12 @@ int animation3(struct rt *rt) {
         break;
       }
 
-      strip.setPixelColor(2, 0, 0, 0);
-      strip.setPixelColor(5, 0, 0, 0);
-      strip.setPixelColor(9, 0, 0, 0);
-      strip.setPixelColor(13, 0, 0, 0);
+      leds.setPixelColor(1, 0, 0, 0);
+      leds.setPixelColor(4, 0, 0, 0);
+      leds.setPixelColor(8, 0, 0, 0);
+      leds.setPixelColor(12, 0, 0, 0);
 
-      strip.show();
-
-      delay(100);
-
-      if((int)mode != 12) {
-        break;
-      }
-
-      strip.setPixelColor(2, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(5, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(9, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(13, COLOR_AMBER_WITH_BRIGHTNESS);
-
-      strip.show();
+      leds.show();
 
       delay(100);
 
@@ -467,12 +416,12 @@ int animation3(struct rt *rt) {
         break;
       }
 
-      strip.setPixelColor(3, 0, 0, 0);
-      strip.setPixelColor(6, 0, 0, 0);
-      strip.setPixelColor(10, 0, 0, 0);
-      strip.setPixelColor(14, 0, 0, 0);
+      leds.setPixelColor(1, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(4, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(8, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(12, COLOR_AMBER_WITH_BRIGHTNESS);
 
-      strip.show();
+      leds.show();
 
       delay(100);
 
@@ -480,12 +429,51 @@ int animation3(struct rt *rt) {
         break;
       }
 
-      strip.setPixelColor(3, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(6, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(10, COLOR_AMBER_WITH_BRIGHTNESS);
-      strip.setPixelColor(14, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(2, 0, 0, 0);
+      leds.setPixelColor(5, 0, 0, 0);
+      leds.setPixelColor(9, 0, 0, 0);
+      leds.setPixelColor(13, 0, 0, 0);
 
-      strip.show();
+      leds.show();
+
+      delay(100);
+
+      if((int)mode != 12) {
+        break;
+      }
+
+      leds.setPixelColor(2, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(5, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(9, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(13, COLOR_AMBER_WITH_BRIGHTNESS);
+
+      leds.show();
+
+      delay(100);
+
+      if((int)mode != 12) {
+        break;
+      }
+
+      leds.setPixelColor(3, 0, 0, 0);
+      leds.setPixelColor(6, 0, 0, 0);
+      leds.setPixelColor(10, 0, 0, 0);
+      leds.setPixelColor(14, 0, 0, 0);
+
+      leds.show();
+
+      delay(100);
+
+      if((int)mode != 12) {
+        break;
+      }
+
+      leds.setPixelColor(3, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(6, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(10, COLOR_AMBER_WITH_BRIGHTNESS);
+      leds.setPixelColor(14, COLOR_AMBER_WITH_BRIGHTNESS);
+
+      leds.show();
 
       delay(100);
 
@@ -495,29 +483,27 @@ int animation3(struct rt *rt) {
     }
 
     for(int i=0; i<NUM_PIXELS; i++) {
-      strip.setPixelColor(i, 0, 0, 0);
+      leds.setPixelColor(i, 0, 0, 0);
     }
 
-    strip.show();
+    leds.show();
   }
 
   RT_END(rt);
 }
 
 void setStaticColor(uint16_t r, uint16_t g, uint16_t b) {
-  strip.clear();
+  leds.clear();
 
   for(int i=0; i<NUM_PIXELS; i++) {
-    strip.setPixelColor(i, r, g, b);
+    leds.setPixelColor(i, r, g, b);
   }
-  strip.show();
+  leds.show();
   delay(10);
-  strip.show();
+  leds.show();
 }
 
 void checkMode() {
-  Serial.print("Applying mode: ");
-  Serial.println((int)mode);
   switch ((int)mode) {
     case 0:
       loadNeopixelState(pixelState01, FLASH_OFFSET_PIXELSTATE01);
@@ -536,7 +522,6 @@ void checkMode() {
       break;
     
     case 3:
-      Serial.print("Setting color to red.");
       setStaticColor(maxBrightness, 0, 0); // Red
       break;
 
@@ -658,8 +643,6 @@ void userBTNInterruptHandler() {
                     } else {
                         mode = 0;
                     }
-                    Serial.print("In mode: ");
-                    Serial.println((int)mode);
                     checkMode();
                     saveMode();
                 }
@@ -679,7 +662,7 @@ void fadeToColor(int fadeTime, uint8_t* animationData, int frameStartIndex) {
     
     // Get starting colors for all pixels
     for (int i = 0; i < NUM_PIXELS; i++) {
-        uint32_t color = strip.getPixelColor(i);
+        uint32_t color = leds.getPixelColor(i);
         startColors[i].r = (color >> 16) & 0xFF;
         startColors[i].g = (color >> 8) & 0xFF;
         startColors[i].b = color & 0xFF;
@@ -702,12 +685,12 @@ void fadeToColor(int fadeTime, uint8_t* animationData, int frameStartIndex) {
             byte currentB = (byte)((startColors[i].b * fadeOutRatio) + (targetB * fadeInRatio));
             
             // Apply brightness mapping and set pixel
-            strip.setPixelColor(i, 
+            leds.setPixelColor(i, 
                 map(currentR, 0, 255, 0, maxBrightness),
                 map(currentG, 0, 255, 0, maxBrightness),
                 map(currentB, 0, 255, 0, maxBrightness));
         }
-        strip.show();
+        leds.show();
         delay(fadeDelay);
     }
 }
@@ -723,7 +706,7 @@ void setup()
     attachInterrupt(USR_BTN, userBTNInterruptHandler, FALLING);
     
     // Initialize Neopixels
-    strip.begin();
+    leds.begin();
     
     // Initialize SHT45
     Wire.begin();
@@ -753,8 +736,8 @@ void setup()
     printHex(node_device_eui, 8);
     Serial.print("Join EUI: ");
     printHex(node_join_eui, 8);
-    Serial.print("App Key: ");
-    printHex(node_app_key, 16);
+    // Serial.print("App Key: "); // Uncomment this and the next line, if you would like to read the app key.
+    // printHex(node_app_key, 16);
 
     if (!api.lorawan.band.set(RAK_REGION_EU868)) {
         Serial.printf("LoRaWan OTAA - set band is incorrect! \r\n");
@@ -852,13 +835,13 @@ void fadeToColor(int fadeTime, uint8_t* animationData, int frameStartIndex, RawC
             byte currentG = (byte)((previousColors[i].g * fadeOutRatio) + (targetColors[i].g * fadeInRatio));
             byte currentB = (byte)((previousColors[i].b * fadeOutRatio) + (targetColors[i].b * fadeInRatio));
             
-            strip.setPixelColor(i, 
+            leds.setPixelColor(i, 
                 map(currentR, 0, 255, 0, maxBrightness),
                 map(currentG, 0, 255, 0, maxBrightness),
                 map(currentB, 0, 255, 0, maxBrightness));
         }
         
-        strip.show();
+        leds.show();
         delay(fadeDelay);
     }
     
@@ -926,12 +909,12 @@ int customAnimation(struct rt *rt) {
                   currentColors[i].b = animationBuffer[pixelIndex + 2];
                   
                   // Apply brightness mapping and set LED
-                  strip.setPixelColor(i, 
+                  leds.setPixelColor(i, 
                       map(currentColors[i].r, 0, 255, 0, maxBrightness),
                       map(currentColors[i].g, 0, 255, 0, maxBrightness),
                       map(currentColors[i].b, 0, 255, 0, maxBrightness));
               }
-              strip.show();
+              leds.show();
           } else {
               // Perform fade
               fadeToColor(fadeTime, animationBuffer, frameStartIndex, currentColors, numFrames);
@@ -1030,7 +1013,7 @@ void periodicUplink(void *data)
     }
     
     
-    if (api.lorawan.send(data_len, data_buffer, 2, false, 1)) {
+    if (api.lorawan.send(data_len, data_buffer, 2, false, 3)) {
         Serial.println("Uplink sent successfully");
     } else {
         Serial.println("Uplink failed");
@@ -1039,12 +1022,6 @@ void periodicUplink(void *data)
 
 void processDownlink(SERVICE_LORA_RECEIVE_T * data)
 {
-  Serial.println("Something received!");
-  for (int i = 0; i < data->BufferSize; i++) {
-      Serial.printf("%x", data->Buffer[i]);
-  }
-  Serial.println();
-  Serial.printf("%x", data->Port);
   if(data->Port != 1) {
     return;
   }
@@ -1106,9 +1083,6 @@ void processDownlink(SERVICE_LORA_RECEIVE_T * data)
             
             case 0x03:  // Set one neopixel to an individual color
                 if (length >= 5) {
-                    Serial.print("Last mode: ");
-                    Serial.println((int)lastMode);
-
                     if((int)lastMode == 1) {
                       pixelState01 = pixelState02;
                     }
@@ -1117,11 +1091,11 @@ void processDownlink(SERVICE_LORA_RECEIVE_T * data)
                     saveMode();
                     uint8_t led_index = buffer[index+1];
                     if (led_index < NUM_PIXELS) {
-                        strip.setPixelColor(led_index, map(buffer[index+2], 0, 255, 0, maxBrightness), map(buffer[index+3], 0, 255, 0, maxBrightness), map(buffer[index+4], 0, 255, 0, maxBrightness));
-                        strip.show();
+                        leds.setPixelColor(led_index, map(buffer[index+2], 0, 255, 0, maxBrightness), map(buffer[index+3], 0, 255, 0, maxBrightness), map(buffer[index+4], 0, 255, 0, maxBrightness));
+                        leds.show();
 
-                        strip.setPixelColor(led_index, map(buffer[index+2], 0, 255, 0, maxBrightness), map(buffer[index+3], 0, 255, 0, maxBrightness), map(buffer[index+4], 0, 255, 0, maxBrightness));
-                        strip.show();
+                        leds.setPixelColor(led_index, map(buffer[index+2], 0, 255, 0, maxBrightness), map(buffer[index+3], 0, 255, 0, maxBrightness), map(buffer[index+4], 0, 255, 0, maxBrightness));
+                        leds.show();
                         
                         // Save state
                         pixelState01.colors[(led_index*3)] = buffer[index+2];
@@ -1132,12 +1106,6 @@ void processDownlink(SERVICE_LORA_RECEIVE_T * data)
                         Serial.printf("Set LED %d to R:%d G:%d B:%d\n", 
                                     led_index, buffer[index+2], buffer[index+3], buffer[index+4]);
                     }
-
-                    Serial.println("Saved colors:");
-                    for(int i=0; i<sizeof(pixelState01.colors); i++) {
-                      Serial.print(pixelState01.colors[i]);
-                    }
-                    Serial.println();
                 }
 
                 index += 5;
@@ -1150,19 +1118,19 @@ void processDownlink(SERVICE_LORA_RECEIVE_T * data)
                     saveMode();
                     int storageCounter = 0;
                     for (int i = 0; i < NUM_PIXELS; i++) {
-                        strip.setPixelColor(i, map(buffer[index+1], 0, 255, 0, maxBrightness), map(buffer[index+2], 0, 255, 0, maxBrightness), map(buffer[index+3], 0, 255, 0, maxBrightness));
+                        leds.setPixelColor(i, map(buffer[index+1], 0, 255, 0, maxBrightness), map(buffer[index+2], 0, 255, 0, maxBrightness), map(buffer[index+3], 0, 255, 0, maxBrightness));
                         pixelState02.colors[storageCounter] = buffer[index+1];
                         pixelState02.colors[storageCounter+1] = buffer[index+2];
                         pixelState02.colors[storageCounter+2] = buffer[index+3];
 
                         storageCounter += 3;
                     }
-                    strip.show();
+                    leds.show();
 
                     for (int i = 0; i < NUM_PIXELS; i++) {
-                        strip.setPixelColor(i, map(buffer[index+1], 0, 255, 0, maxBrightness), map(buffer[index+2], 0, 255, 0, maxBrightness), map(buffer[index+3], 0, 255, 0, maxBrightness));
+                        leds.setPixelColor(i, map(buffer[index+1], 0, 255, 0, maxBrightness), map(buffer[index+2], 0, 255, 0, maxBrightness), map(buffer[index+3], 0, 255, 0, maxBrightness));
                     }
-                    strip.show();
+                    leds.show();
                     
                     saveNeopixelState(pixelState02, FLASH_OFFSET_PIXELSTATE02);
                     
