@@ -56,18 +56,33 @@ function encodeDownlink(input) {
       
     case 'setAnimation':
       bytes.push(0x05);
-      bytes.push(data.frames.length);
+      bytes.push(data.totalFrames); // Total frames in complete animation
       
-      data.frames.forEach(frame => {
+      // Process up to 2 frames starting at frameStartIndex
+      const framesInPayload = Math.min(2, data.frames.length);
+      
+      for (let i = 0; i < framesInPayload; i++) {
+        const frame = data.frames[i];
+        
+        // Add frame header
         bytes.push(frame.delay & 0xFF);
         bytes.push(frame.fadeTime & 0xFF);
         
+        // Add pixel data
         frame.pixels.forEach(pixel => {
           bytes.push(pixel.red & 0xFF);
           bytes.push(pixel.green & 0xFF);
           bytes.push(pixel.blue & 0xFF);
         });
-      });
+        
+        // Pad frame to 50 bytes if needed
+        const pixelsNeeded = 16 - frame.pixels.length;
+        for (let p = 0; p < pixelsNeeded; p++) {
+          bytes.push(0x00); // R
+          bytes.push(0x00); // G
+          bytes.push(0x00); // B
+        }
+      }
       break;
   }
   
