@@ -90,6 +90,12 @@ Simply send `0x04` followed by one byte for red, one for green and one for blue.
 So the values can be from `0` to `255` or from `0x00` to `0xFF`. <br/>
 
 #### Set a custom animation
+
+To make it easier to create custom animations, I've created a web tool to do that, you can find it here: [https://jan-olegiebel.github.io/LoRaWAN-LED-Christmas-Tree/tools/frameGeneratorTool/frameGeneratorTool.html](https://jan-olegiebel.github.io/LoRaWAN-LED-Christmas-Tree/tools/frameGeneratorTool/frameGeneratorTool.html)
+
+When you're done, just click the Export button and send the generated data to the Christmas Tree.
+Note that the order in which you send the frames should be exactly the same as in the frame generator.
+
 This command `0x05` allows users to set a custom animation, consisting of one or multiple frames (1-6). <br/>
 Because of LoRaWAN package size limitations frame counts larger than 2 need to be send independently. <br/>
 Byte 0 will tell how many frames will be send by the following command. <br/>
