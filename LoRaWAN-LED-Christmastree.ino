@@ -52,7 +52,7 @@ uint8_t mode = 0;
 uint8_t lastMode = 0;
 
 // Timer for periodic uplink
-uint32_t TX_INTERVAL = 20000;  // Default 5 minutes in milliseconds
+uint32_t TX_INTERVAL = 300000;  // Default 5 minutes in milliseconds
 
 uint16_t maxBrightness = 15000;
 
