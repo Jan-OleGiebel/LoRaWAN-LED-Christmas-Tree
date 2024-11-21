@@ -29,7 +29,7 @@ Here are the sensor specifications:
 | Humidity                          | Value     |
 |-----------------------------------|-----------|
 | Typ. relative humidity accuracy   | 1.8 %RH   |
-| Operating relative humidity range | 0-100 %RG |
+| Operating relative humidity range | 0-100 %RH |
 
 | Temperature                 | Value        |
 |-----------------------------|--------------|
