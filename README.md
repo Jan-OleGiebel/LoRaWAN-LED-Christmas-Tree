@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repo contains the software for my LoRaWAN®-LED Christmastree project.
+This repo contains the software for my LoRaWAN®-LED Christmas Tree project.
 The goal is to build a small christmas tree shaped PCB with Neopixel LEDs as decoration.
 The tree can be configured via LoRaWAN® downlinks,
 as it implements a class C device and sends the ambient temperature and humidity via uplinks.
@@ -14,6 +14,38 @@ To get started, compile and flash the firmware to your RAK3172. Next, copy the D
 Insert some batteries and turn on the power switch. (SW1. The tree is on when the switch is pushed down.) SW2 is the reset button, and SW3 allows you to manually toggle through the modes described in the [downlink payload description](#mode) below.
 
 When turned on the tree should join and send a message every 10 minutes (default).
+
+## Powering
+
+To get the most out of the Christmas Tree, I highly recommend using high capacity AA batteries, such as [these](https://online-batterien.de/a/varta-industrial-pro-mignon-aa-batterie-4006-2er-folie/400084) or [these](https://online-batterien.de/a/energizer-ultimate-lithium-l91-mignon-aa-batterie-4er-blister/401064).
+
+## Sensor description
+
+The Christmas Tree has an integrated Sensirion SHT41-AD1F-R2 temperature and humidity sensor.
+[Link to the product](https://sensirion.com/products/catalog/SHT41-AD1F)
+
+Here are the sensor specifications:
+
+| Humidity                          | Value     |
+|-----------------------------------|-----------|
+| Typ. relative humidity accuracy   | 1.8 %RH   |
+| Operating relative humidity range | 0-100 %RG |
+
+| Temperature                 | Value        |
+|-----------------------------|--------------|
+| Typ. temperature accuracy   | 0.2 °C       |
+| Operating temperature range | -40 - 125 °C |
+
+## LoRaWAN® informations
+
+If you use the module lists in the BOM, the frequency is Europe 868 MHz.
+If you want to use other frequencies, change the part number accordingly. A list of all RAK3172 modules can be found at [here](https://docs.rakwireless.com/product-categories/wisduo/rak3172-module/datasheet#ordering-information).
+
+The Christmas Tree uses LoRaWAN® Specification 1.0.3 and Regional Parameters version RP001 Regional Parameters 1.0.3 Revision A.
+
+## Ordering information
+
+If you want to rebuild the project, you can find the Gerber file in the [/fabrication](/fabrication) folder as well as the BOM.
 
 ## LoRaWAN® Payload Description
 ### Uplinks
