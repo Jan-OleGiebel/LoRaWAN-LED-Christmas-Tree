@@ -45,7 +45,7 @@ The Christmas Tree uses LoRaWAN® Specification 1.0.3 and Regional Parameters ve
 
 ## Ordering information
 
-If you want to rebuild the project, you can find the Gerber file in the [/fabrication](/fabrication) folder as well as the BOM.
+If you want to rebuild the project, you can find the Gerber file in the [/fabrication](/fabrication) folder as well as the BOM and pick and place file.
 
 ## LoRaWAN® Payload Description
 ### Uplinks
