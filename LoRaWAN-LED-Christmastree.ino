@@ -25,7 +25,7 @@
 #include <Wire.h>
 #include "WS2816_Driver.h"
 
-#define FW_VERSION 4
+#define FW_VERSION 5
 
 // Neopixel configuration
 #define NEOPIXEL_PIN PA1
@@ -86,7 +86,7 @@ rt rtAnimation3;
 rt rtCustomAnimation;
 
 // Define debounce delay in milliseconds
-const unsigned long DEBOUNCE_DELAY = 50;
+const unsigned long DEBOUNCE_DELAY = 25;
 volatile unsigned long lastDebounceTime = 0;
 
 bool firstUplink = false;
@@ -372,7 +372,7 @@ int animation3(struct rt *rt) {
 
     for(int i=0; i<25; i++) {
       if((int)mode != 12) {
-        break;
+        goto endOfAnimation3;
       }
 
       leds.setPixelColor(0, 0, 0, 0);
@@ -386,7 +386,7 @@ int animation3(struct rt *rt) {
       delay(100);
 
       if((int)mode != 12) {
-        break;
+        goto endOfAnimation3;
       }
 
       leds.setPixelColor(0, COLOR_AMBER_WITH_BRIGHTNESS);
@@ -400,7 +400,7 @@ int animation3(struct rt *rt) {
       delay(100);
 
       if((int)mode != 12) {
-        break;
+        goto endOfAnimation3;
       }
 
       leds.setPixelColor(1, 0, 0, 0);
@@ -413,7 +413,7 @@ int animation3(struct rt *rt) {
       delay(100);
 
       if((int)mode != 12) {
-        break;
+        goto endOfAnimation3;
       }
 
       leds.setPixelColor(1, COLOR_AMBER_WITH_BRIGHTNESS);
@@ -426,7 +426,7 @@ int animation3(struct rt *rt) {
       delay(100);
 
       if((int)mode != 12) {
-        break;
+        goto endOfAnimation3;
       }
 
       leds.setPixelColor(2, 0, 0, 0);
@@ -439,7 +439,7 @@ int animation3(struct rt *rt) {
       delay(100);
 
       if((int)mode != 12) {
-        break;
+        goto endOfAnimation3;
       }
 
       leds.setPixelColor(2, COLOR_AMBER_WITH_BRIGHTNESS);
@@ -452,7 +452,7 @@ int animation3(struct rt *rt) {
       delay(100);
 
       if((int)mode != 12) {
-        break;
+        goto endOfAnimation3;
       }
 
       leds.setPixelColor(3, 0, 0, 0);
@@ -465,7 +465,7 @@ int animation3(struct rt *rt) {
       delay(100);
 
       if((int)mode != 12) {
-        break;
+        goto endOfAnimation3;
       }
 
       leds.setPixelColor(3, COLOR_AMBER_WITH_BRIGHTNESS);
@@ -478,16 +478,22 @@ int animation3(struct rt *rt) {
       delay(100);
 
       if((int)mode != 12) {
-        break;
+        goto endOfAnimation3;
       }
     }
 
     for(int i=0; i<NUM_PIXELS; i++) {
+      if((int)mode != 12) {
+        break;
+      }
+
       leds.setPixelColor(i, 0, 0, 0);
     }
 
     leds.show();
   }
+
+  endOfAnimation3:
 
   RT_END(rt);
 }
@@ -507,10 +513,6 @@ void checkMode() {
   switch ((int)mode) {
     case 0:
       loadNeopixelState(pixelState01, FLASH_OFFSET_PIXELSTATE01);
-      if((int)lastMode == 12){
-        delay(100);
-        loadNeopixelState(pixelState01, FLASH_OFFSET_PIXELSTATE01);
-      }
       break;
     
     case 1:
