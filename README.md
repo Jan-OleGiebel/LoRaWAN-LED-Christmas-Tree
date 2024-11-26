@@ -42,6 +42,7 @@ If you use the module lists in the BOM, the frequency is Europe 868 MHz.
 If you want to use other frequencies, change the part number accordingly. A list of all RAK3172 modules can be found at [here](https://docs.rakwireless.com/product-categories/wisduo/rak3172-module/datasheet#ordering-information).
 
 The Christmas Tree uses LoRaWAN® Specification 1.0.3 and Regional Parameters version RP001 Regional Parameters 1.0.3 Revision A.
+In addition ADR is enabled.
 
 ## Ordering information
 
