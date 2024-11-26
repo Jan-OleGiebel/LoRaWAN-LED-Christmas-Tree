@@ -25,7 +25,7 @@
 #include <Wire.h>
 #include "WS2816_Driver.h"
 
-#define FW_VERSION 5
+#define FW_VERSION 6
 
 // Neopixel configuration
 #define NEOPIXEL_PIN PA1
@@ -753,11 +753,6 @@ void setup()
 
     if (!api.lorawan.njm.set(RAK_LORA_OTAA)) {
         Serial.println("Join mode error");
-        return;
-    }
-    
-    if (!api.lorawan.dr.set(5)) {
-        Serial.println("DR error");
         return;
     }
 
