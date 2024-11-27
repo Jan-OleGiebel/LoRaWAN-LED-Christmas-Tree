@@ -729,9 +729,6 @@ void setup()
     api.lorawan.appkey.get(node_app_key, 16);
 
     Serial.printf("Set the low power mode %s\n\r", api.system.lpm.set(1) ? "Success" : "Fail");
-
-    // Enable ADR
-    api.lorawan.adr.set(true);
     
     Serial.println("Pre-flashed Credentials:");
     Serial.print("Device EUI: ");
