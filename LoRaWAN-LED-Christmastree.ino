@@ -25,7 +25,7 @@
 #include <Wire.h>
 #include "WS2816_Driver.h"
 
-#define FW_VERSION 6
+#define FW_VERSION 7
 
 // Neopixel configuration
 #define NEOPIXEL_PIN PA1
@@ -1167,6 +1167,9 @@ void processDownlink(SERVICE_LORA_RECEIVE_T * data)
                   }
                   
               }
+              index = length;
+              break;
+            default:
               index = length;
               break;
         }
